@@ -3,7 +3,7 @@
 #include <linux/slab.h>
 #include <linux/rwlock.h>
 #include <linux/jiffies.h>
-#include <core.h>
+#include <base.h>
 
 /* Lista global de Cores registrados no sistema */
 static LIST_HEAD(reflector_registry_list);
