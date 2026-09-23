@@ -93,6 +93,14 @@ int reflector_register_core(struct reflector_object *obj)
     pr_info("reflector: Core registrado com sucesso na porta [%s/%s/%u]\n",
             obj->port.namespace_str, obj->port.name, obj->port.id);
 
+    
+    ret = reflector_init_object_queues(obj);
+    if (ret) return ret;
+
+    write_lock_irqsave(&port_hash_lock, flags);
+    hash_add(port_registry_hash, &obj->node, calc_port_hash(&obj->port));
+    write_unlock_irqrestore(&port_hash_lock, flags);
+    
     return 0;
 }
 EXPORT_SYMBOL_GPL(reflector_register_core);
@@ -103,6 +111,11 @@ EXPORT_SYMBOL_GPL(reflector_register_core);
 void reflector_unregister_core(struct reflector_object *obj)
 {
     unsigned long flags;
+
+    write_lock_irqsave(&port_hash_lock, flags);
+    hash_del(&obj->node);
+    write_unlock_irqrestore(&port_hash_lock, flags);
+    
     bool found = false;
     struct reflector_object *entry;
 
@@ -134,5 +147,6 @@ void reflector_unregister_core(struct reflector_object *obj)
 
     /* 4. Solta a referência de posse do Registry */
     reflector_obj_put(obj);
+     reflector_free_object_queues(obj);
 }
 EXPORT_SYMBOL_GPL(reflector_unregister_core);
