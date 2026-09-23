@@ -3,7 +3,7 @@
 #include <linux/cpumask.h>
 #include <linux/slab.h>
 #include <linux/delay.h>
-#include "../../include/reflector.h"
+#include <base.h>
 
 /* Estrutura estrutural do Worker mapeado por CPU */
 struct reflector_worker {
